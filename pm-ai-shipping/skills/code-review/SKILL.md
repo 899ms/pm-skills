@@ -130,7 +130,7 @@ checklist will not help; each needs an explicit probe:
    removal and reuse. A label, a position or arrival order is suspicious exactly when those
    properties can fail. Probe: run two operations concurrently and complete them out of order.
 
-The full set of twelve diagnostic lenses, each with a detection tell, is in
+The full set of thirteen diagnostic lenses, each with a detection tell, is in
 `references/correctness-taxonomy.md`. They are overlapping lenses, not a quota to fill.
 
 ## Refutation: the discipline that makes this worth running
@@ -157,6 +157,15 @@ Do not import the security sub-case's attacker/victim test into correctness. **A
 can harm only the person who triggered it and still be serious.** Equally, "keep unless disproved" is
 too permissive here — an ungrounded suspicion with no constructed execution is not a finding. When
 both sub-cases are active, apply each test only to its own dimension.
+
+**Absorption is not prevention.** The most expensive refutation mistake is finding something
+downstream that happens to hide the defect - a cache that usually holds the value, a retry that
+usually succeeds, a default that is usually right - and dropping the finding. That is not a
+guarantee, it is a coincidence with good odds, and it fails the day the absorber is cold, evicted or
+reconfigured. Drop only on a mechanism that makes the execution *impossible*, and say which mechanism
+it was. For the same reason, **"it works nearly always" describes a race, not a refutation** - a
+timing window that usually resolves correctly is a finding, and the fact that you had to reason about
+which side usually wins is the evidence.
 
 Passing tests, unfamiliar code, a suspicious name, a missing test and a sibling difference are
 evidence to investigate — none of them is proof, and none is refutation. Deduplicate by violated
@@ -186,6 +195,21 @@ is recall-first work: a missed cross-boundary flow is the costly failure, and a 
 drops to a cheaper model or a lower effort is the cheapest way to lose one. If any worker is rerouted
 or downgraded, say which in the report — a reader who assumes one model saw everything will
 misjudge the coverage.
+
+**One model, unless told otherwise.** Fan-out here is for coverage, not for a second opinion: every
+worker runs the same model as the coordinator. Do not bring in a second model to cross-check findings
+unless explicitly asked. Mixing models makes the result unattributable — when this skill is being
+measured, or compared across models, a single foreign worker invalidates the number. The independent
+second-model pass is a separate, explicitly-invoked step (`/ship-check` Step 6), never something this
+skill reaches for on its own.
+
+**Give workers read-only tools.** A review worker needs to read, search and navigate — nothing more.
+Withhold file writes, edits and any mutating command; allow read, search and non-mutating inspection.
+Three reasons, in order of importance: a worker that can edit will drift from reviewing into
+"helpfully" fixing and stop reporting what it silently repaired; the repository under review must end
+the run byte-identical to how it started, or the findings cannot be checked against it; and a
+read-only worker cannot damage a working tree it misunderstood. If the host cannot restrict tools,
+say so in the prompt and verify the tree is unchanged when the run ends.
 
 ## Report
 
