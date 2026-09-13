@@ -196,20 +196,19 @@ drops to a cheaper model or a lower effort is the cheapest way to lose one. If a
 or downgraded, say which in the report — a reader who assumes one model saw everything will
 misjudge the coverage.
 
-**One model, unless told otherwise.** Fan-out here is for coverage, not for a second opinion: every
-worker runs the same model as the coordinator. Do not bring in a second model to cross-check findings
-unless explicitly asked. Mixing models makes the result unattributable — when this skill is being
-measured, or compared across models, a single foreign worker invalidates the number. The independent
-second-model pass is a separate, explicitly-invoked step (`/ship-check` Step 6), never something this
-skill reaches for on its own.
+**One model. Name it on every worker.** Fan-out here buys coverage, not a second opinion. Pass the
+coordinator's own model explicitly on each spawn — "inherit" is not a routing decision, and a worker
+that quietly lands on a cheaper model is the easiest way to lose a finding. **Do not bring in a
+different model**, to review or to cross-check, unless you are explicitly asked: mixing models makes
+the result unattributable, and when this skill is being measured or compared across models, one
+foreign worker invalidates the number. The independent second-model pass is a separate,
+explicitly-invoked step (`/ship-check` Step 6), never something this skill reaches for on its own.
 
-**Give workers read-only tools.** A review worker needs to read, search and navigate — nothing more.
-Withhold file writes, edits and any mutating command; allow read, search and non-mutating inspection.
-Three reasons, in order of importance: a worker that can edit will drift from reviewing into
-"helpfully" fixing and stop reporting what it silently repaired; the repository under review must end
-the run byte-identical to how it started, or the findings cannot be checked against it; and a
-read-only worker cannot damage a working tree it misunderstood. If the host cannot restrict tools,
-say so in the prompt and verify the tree is unchanged when the run ends.
+**Tell workers they are reading, not editing.** A review worker needs to read, search and navigate;
+it must not modify the tree. State that in the worker's instructions — a worker that starts editing
+drifts from reviewing into "helpfully" fixing and stops reporting what it silently repaired, and the
+findings can no longer be checked against the code they describe. Say it in the prompt rather than
+assuming the host will enforce it, and confirm the tree is unchanged when the run ends.
 
 ## Report
 
