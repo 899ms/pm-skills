@@ -20,6 +20,12 @@ This is a static review of code and queries, not a load test.
 
 Audit **$ARGUMENTS**. If empty, review the whole repository, prioritizing list and dashboard views, frequently hit endpoints, and large tables.
 
+## Model and orchestration
+
+- **Run every subagent on the strongest model available** — Fable or Mythos when you have access, otherwise Opus 4.8. Match the **effort level of the current session** when the surface exposes it.
+- **Flat fan-out for large scopes.** For a big repo, fan out with parallel subagents — one per view/route/table cluster running the three checks below — then rank the merged findings yourself. One level is the target; nest a second only when a cluster is too big for one agent's context. Don't reach for a self-generating workflow.
+- **Reroutes are unlikely here, but report them if they happen.** Unlike the security audit, performance work rarely trips Fable's safety classifiers. If a cluster does get rerouted to Opus 4.8, note it in the report so the reader knows the model mix.
+
 ## The audit
 
 ### 1. Over-fetch in view payloads
@@ -56,4 +62,5 @@ End with what's already efficient (say it explicitly) and what needs runtime pro
 - Rank by impact-per-effort — one missing index on a hot table usually beats ten micro-optimizations.
 - Don't flag theoretical inefficiency with no growth path; flag what breaks as rows or traffic scale.
 - This command covers performance only. For authorization, injection, and data-exposure risks, use `/security-audit-static`.
+- This is the data-backed-application specialisation of the **code-review** skill's performance sub-case. For logic and state defects, or for a review across several dimensions at once, use `/pm-ai-shipping:code-review`.
 - For an end-to-end pass with documentation and a shipping packet, use `/ship-check`.

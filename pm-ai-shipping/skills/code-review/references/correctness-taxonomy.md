@@ -1,5 +1,8 @@
 # Correctness taxonomy — twelve lenses, with detection tells
 
+*Reference for the correctness sub-case — the core of the `code-review` skill. The performance and
+security sub-cases have their own files alongside this one.*
+
 Overlapping diagnostic lenses, not a classification scheme and not a quota. Each entry says **how you
 detect it**, because a class name alone changes nothing about what a reviewer looks at.
 

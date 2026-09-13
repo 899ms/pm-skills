@@ -23,6 +23,12 @@ This is a review, not a guarantee: it produces code-review findings, not confirm
 
 Audit **$ARGUMENTS**. If empty, audit the whole repository, prioritizing request handlers, auth, data access, background jobs, and anything that renders, fetches, executes, logs, or stores user-controlled data. For non-trivial scopes, fan out with parallel subagents — one per function/module cluster, each running the mapping and inspection (steps 1–3); then merge candidates and run the self-refute (step 4) yourself over the full set.
 
+## Model and orchestration
+
+- **Run every subagent on the strongest model available** — Fable or Mythos when you have access, otherwise Opus 4.8. Match the **effort level of the current session** when the surface exposes it. This is recall-first work: a missed cross-file flow is the costly failure, so don't let a cluster silently drop to a cheaper model or a lower effort.
+- **Expect reroutes, and report them.** A security audit is exactly the content Fable's safety classifiers screen for, so some subagents will be **automatically rerouted to Opus 4.8**. That is fine for this work — but say so. Note in the report which clusters ran on the fallback model, so the reader knows the audit's model mix instead of assuming one model saw everything.
+- **Flat fan-out, not a workflow.** One level of parallel subagents (parent → cluster auditors → merge) is the target. Nest a second level **only** when a single cluster is too big for one agent's context. A deep org chart or a self-generating workflow adds coordination cost without improving recall here.
+
 ## The audit (small engine, strong constraint)
 
 ### 1. Map entry points to trust boundaries and sinks
@@ -45,7 +51,9 @@ For each finding, try to disprove it. Default to **keep** unless you find cited 
 
 Name the **attacker** and the **victim**: refute if the only victim is the attacker on their own machine/account/tenant/data and no shared system or privilege boundary is crossed; keep if the impact reaches other users, tenants, shared infrastructure, billing, email reputation, secrets, or compliance-sensitive data. **Never apply attacker-equals-victim refutation to SSRF/outbound-network sinks, shared billing or quota sinks, data-exposure findings, cross-tenant or cross-principal flows, or server-side execution/rendering** — those harm someone other than the attacker by definition. Never refute a finding merely because the code is pre-existing — pre-existing bugs are the point. Do not speculate.
 
-### 5. Report only what survives
+### 5. Report only what survives — with an OWASP Top 10 backstop
+
+Before writing the report, map every surviving finding to its OWASP Top 10 category, and flag any category with **zero** findings as an explicit "not covered — double-check" line. This catches the classes this engine underweights: **A02 cryptographic failures** (plaintext or weakly-hashed credentials, tokens, or PII at rest; predictable tokens; missing encryption on sensitive columns), **A06 vulnerable and outdated components** (a dependency with a *reachable* exploit path — not version-drift noise), and **A09 logging and monitoring failures** (auth failures, access-control denials, and privileged actions that leave no trace for detection). The backstop is a coverage check, not a mandate to invent findings — an honest "no evidence found in A02" is a valid result.
 
 ## High-miss checklist (technology-shaped, not stack-specific)
 
@@ -55,7 +63,8 @@ Apply these — they're where AI-built apps most often fail:
 - **Auth-provider drift** — claims from an external identity provider (e.g. Clerk) trusted without verifying how they map to data scope.
 - **Gate/action field mismatch** — permission checked on one ID, action performed on an independent ID never proven to belong to it.
 - **Forgeable request signals** — endpoints gated by `?source=cron`, `?bot=1`, guessable headers, or unsigned webhook-like payloads instead of real auth. Raise severity when the endpoint mutates data, sends email, or triggers paid usage.
-- **Output encoding vs. input validation** — user data interpolated into HTML, `<title>`, attributes, JSON-LD, SQL, or Markdown must be encoded for *that* sink; input validation doesn't count. (XSS, CSP gaps.)
+- **Output encoding vs. input validation, and CSP** — user data interpolated into HTML, `<title>`, attributes, JSON-LD, SQL, or Markdown must be encoded for *that* sink; input validation doesn't count. Check the Content-Security-Policy itself: weak or missing directives, `unsafe-inline`, wildcard sources, inline event handlers — recommend a stricter policy that still supports app features. (XSS, CSP.)
+- **Prompt injection and agent abuse (AI apps)** — treat the model as both a sink and a source. Untrusted content (fetched pages, uploaded files, DB rows, tool output) reaching an LLM prompt; attacker text driving a privileged tool call or agent action (confused deputy); system-prompt or secret exfiltration; and unvalidated LLM *output* flowing into a downstream sink (SQL, shell, HTML, a follow-on tool call).
 - **SSRF / renderer abuse** — attacker-influenced URLs, HTML, SVG, or Markdown reaching an outbound fetch or a renderer (headless browser, PDF/OG-image generator).
 - **Parser / validator differentials** — the validator accepts a value the consumer interprets differently: unanchored regex, `startsWith`/substring allowlists, URL-parser disagreement, encoding/case/slash/path-normalization mismatch, or validation on one representation and execution on another.
 - **Fail-open paths** — error, `catch`, timeout, cancellation, cache-miss, stale-cache, feature-flag, or boundary-value branches that default to *allow*. AI code loves a permissive fallback.
@@ -83,4 +92,5 @@ End with: the root-cause theme across findings; **what is well-built — say it 
 
 - Don't report generic hardening with no concrete impact, outdated deps without a reachable path, or test/mock code unless it ships. Logic and authorization bugs with no classic sink still count.
 - This command covers security only. For over-fetching, indexes, and caching, use `/performance-audit-static`.
+- This is the specialised procedure behind the **code-review** skill's security sub-case. For logic and state defects, or for a review across several dimensions at once, use `/pm-ai-shipping:code-review`.
 - For an end-to-end pass that documents first and produces a shipping packet, use `/ship-check`.

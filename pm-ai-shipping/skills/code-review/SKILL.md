@@ -1,6 +1,6 @@
 ---
 name: code-review
-description: "Review code for actionable correctness, performance, or security defects — each dimension independently optional. Anchors on agreements between participants across a boundary, forces a violating execution, and refutes every candidate before reporting. Use when asked to review changes, find bugs, audit a codebase, or check whether a fix is safe."
+description: "Review code for actionable defects. Correctness is the core; performance and security are optional sub-cases of the same engine. Anchors on agreements between participants across a boundary, forces a violating execution, and refutes every candidate before reporting. Use when asked to review changes, find bugs, audit a codebase, or check whether a fix is safe."
 ---
 
 # Code Review
@@ -18,6 +18,25 @@ producer and a consumer, a writer and a later reader, two branches that should e
 state. A checklist applied file-by-file cannot see those, because the two halves are never in view at
 the same time. So the unit of review here is the **agreement**, not the file.
 
+## Structure: one engine, three anchors
+
+Code review is the skill. **Correctness is its core** — the dimension generic tooling covers worst,
+and the one described in full below. **Performance and security are sub-cases**: the same engine, the
+same refutation discipline, the same report contract, with a different anchor and one or two extra
+rules each.
+
+| Sub-case | Anchor | Where its rules live |
+|---|---|---|
+| **Correctness** *(core, default)* | Agreements between participants across a boundary | This file + `references/correctness-taxonomy.md` |
+| **Performance** | Workload → resource demand → growth or contention → consequence | `references/performance-review.md` |
+| **Security** | Source → trust boundary → sink, with an attacker controlling the source | `references/security-review.md` |
+
+Read a sub-case's file only when that sub-case is selected. Each is short on purpose: it states what
+*differs*, and the rest of this file still applies.
+
+Sub-cases are independently *activated*, not mutually exclusive. One root cause can carry correctness
+and security impact — report it once, with both impacts.
+
 ## Invocation
 
 ```
@@ -32,9 +51,9 @@ this one.
 
 These are instruction arguments, not shell flags.
 
-- **Default: `correctness`.** It is the dimension generic tooling covers worst.
-- An explicit list selects exactly those dimensions; `all` selects three. "Find bugs" means
-  correctness. Never silently reinterpret an unknown or empty selection — ask.
+- **Default: `correctness`.** Bare "review this" or "find bugs" means correctness only.
+- An explicit list selects exactly those sub-cases; `all` selects three. Never silently reinterpret
+  an unknown or empty selection — ask.
 - **Scope:** use what was asked. Otherwise review working changes if present, else the repository.
 - **State the selected dimensions, the scope and the comparison baseline before investigating.**
 - Reviewing changes means following dependencies *beyond* the changed lines, and distinguishing
@@ -43,23 +62,14 @@ These are instruction arguments, not shell flags.
 
 ## Shared engine
 
-Every dimension uses one skeleton. Only the anchor and the refutation rules differ.
+Every sub-case uses one skeleton. Only the anchor and the refutation rules differ.
 
 **Map a flow → identify an obligation → inspect every participant → construct a violating execution
 → trace the consequence → attempt refutation → report.**
 
 Build one minimal map first: inputs, major execution flows, who owns which state, external
-dependencies, observable effects. Each selected dimension enriches it — do not build three maps, and
+dependencies, observable effects. Each selected sub-case enriches it — do not build three maps, and
 do not make a security-only run wait on correctness mapping.
-
-| Dimension | Anchor |
-|---|---|
-| **Correctness** | Agreements between participants across a boundary |
-| **Performance** | Workload → resource demand → growth or contention → material consequence |
-| **Security** | Trust boundaries and sinks (see `/security-audit-static`, which owns the specialised procedure and its attacker/victim refutation rules) |
-
-Dimensions are independently *activated*, not mutually exclusive. One root cause can carry
-correctness and security impact — report it once, with both impacts.
 
 ## Correctness: the agreement engine
 
@@ -143,9 +153,10 @@ intentional contract; a precondition excluding the input; a different owner resp
 | **Drop** | Cited evidence defeats the execution, the obligation or the consequence. |
 | **Unresolved** | An essential contract or runtime fact is unknown. List it *separately from findings*. |
 
-Do not import the security dimension's attacker/victim test. **A correctness defect can harm only the
-person who triggered it and still be serious.** Equally, "keep unless disproved" is too permissive
-here — an ungrounded suspicion with no constructed execution is not a finding.
+Do not import the security sub-case's attacker/victim test into correctness. **A correctness defect
+can harm only the person who triggered it and still be serious.** Equally, "keep unless disproved" is
+too permissive here — an ungrounded suspicion with no constructed execution is not a finding. When
+both sub-cases are active, apply each test only to its own dimension.
 
 Passing tests, unfamiliar code, a suspicious name, a missing test and a sibling difference are
 evidence to investigate — none of them is proof, and none is refutation. Deduplicate by violated
@@ -159,7 +170,7 @@ agent per taxonomy class. Partitioning by file is precisely the split that hides
 defects, which are the ones worth finding.
 
 1. The coordinator builds the initial map and identifies shared state.
-2. Each worker gets a bounded flow, its participants, the selected dimensions and open questions.
+2. Each worker gets a bounded flow, its participants, the selected sub-cases and open questions.
 3. Workers inspect **both sides** of their agreements and may follow dependencies outside their list.
 4. Workers return candidates, cited evidence, completed refutations and unresolved relationships.
 5. The coordinator reconciles assumptions and any relationship that crosses assignments.
@@ -169,6 +180,12 @@ defects, which are the ones worth finding.
 holding half its contract. Keep integration capacity in reserve: an unresolved relationship spanning
 two assignments stays unexamined until someone closes it. One level of fan-out is the target; if
 delegation is unavailable or the scope is small, run the same procedure sequentially.
+
+**Run workers on the strongest model available, and match the current session's effort level.** This
+is recall-first work: a missed cross-boundary flow is the costly failure, and a worker that silently
+drops to a cheaper model or a lower effort is the cheapest way to lose one. If any worker is rerouted
+or downgraded, say which in the report — a reader who assumes one model saw everything will
+misjudge the coverage.
 
 ## Report
 
@@ -196,8 +213,8 @@ Unexamined areas and essential unknowns:
 Cite **both** participants for a cross-boundary defect, and do not group findings only by file — that
 hides the relationship the review exists to find.
 
-**Coverage means work performed, not boxes ticked.** For each selected dimension report: examined
-with supported findings · examined, none supported · not applicable, with reason · not examined, with
+**Coverage means work performed, not boxes ticked.** For each selected sub-case report: examined with
+supported findings · examined, none supported · not applicable, with reason · not examined, with
 reason. Zero findings in a category does **not** mean "not covered", and a table of ticks is not
 evidence of completeness. Say "no supported findings in the examined scope" — never that the code is
 bug-free.
@@ -205,6 +222,9 @@ bug-free.
 ## Notes
 
 - Say explicitly what is well built. A review that only accuses is easy to dismiss.
-- For trust boundaries, sinks and OWASP coverage use `/security-audit-static`; for the doc-vs-code
-  axis use the `intended-vs-implemented` skill. This skill does not restate either.
+- The two sub-cases have mature commands behind them: `/security-audit-static` (trust boundaries,
+  sinks, OWASP backstop) and `/performance-audit-static` (over-fetching, indexes, caching). Run the
+  command when the sub-case is the whole job; use the reference file when it is one dimension of a
+  broader review. This skill does not restate either.
+- For the doc-vs-code axis use the `intended-vs-implemented` skill.
 - A static review produces code-review findings, not confirmed exploits or measured regressions.
