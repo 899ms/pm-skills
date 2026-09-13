@@ -12,9 +12,10 @@ Start with `/ship-check` for the full sequence, or run a single stage with the s
 
 Install from the [pm-skills marketplace](https://github.com/phuryn/pm-skills) and enable the `pm-ai-shipping` plugin. Each command can be triggered with `/pm-ai-shipping:<command>` or its short `/<command>` form; skills auto-load when the topic matches.
 
-## Skills (2)
+## Skills (3)
 
 - **shipping-artifacts** — The durable documentation set that makes an AI-built app reviewable: a core every app needs (architecture, user/permission flows, permissions, variables/secrets, test-coverage map) plus conditional docs added only when they apply (emails, cron, SEO, embedded agents/automation). Defines what each doc must capture and how a reviewer uses it.
+- **code-review** — Review code for actionable correctness, performance, or security defects, each dimension independently optional. Anchors on agreements between participants across a boundary — the defects that are invisible file-by-file because each side looks reasonable alone — forces a violating execution, and refutes every candidate before reporting.
 - **intended-vs-implemented** — The method for finding the gap between what a system is documented to do and what the code actually does, with cited evidence on both sides and without hand-wavy findings.
 
 ## Commands (5)
