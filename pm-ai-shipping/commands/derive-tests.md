@@ -19,7 +19,7 @@ This produces a coverage map (`tests.md`) and concrete test cases, not a finishe
 
 ## Prerequisite: documented intent
 
-Tests are derived from the docs, so the docs come first. If `/documentation/*.md` is missing or thin, run `/document-app` (and `/derive-tests` reads `flows.md`, `permissions.md`, and `automation.md` most heavily). You cannot map coverage to rules you never wrote down — where intent is absent, say so rather than inventing rules to test.
+Tests are derived from the docs, so the docs come first. If `documentation/*.md` is missing or thin, run `/document-app` (and `/derive-tests` reads `flows.md`, `permissions.md`, and `automation.md` most heavily). You cannot map coverage to rules you never wrote down — where intent is absent, say so rather than inventing rules to test.
 
 ## The workflow
 
@@ -104,7 +104,7 @@ Test Coverage: [scope]
 [rules with no test yet, ranked by what crossing them exposes]
 ```
 
-Optionally write the coverage map to `/documentation/tests.md` and the full report to `/reports/test_plan_{timestamp}.md`.
+Write the coverage map to `documentation/tests.md` and the full report to `reports/test_plan_{timestamp}.md`, and give the user both paths.
 
 ## Notes
 

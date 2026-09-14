@@ -1,13 +1,14 @@
 ![GitHub stars](https://img.shields.io/github/stars/phuryn/pm-skills)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow?style=flat-square)](https://github.com/phuryn/pm-skills/blob/main/LICENSE)
 [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen?style=flat-square)](https://github.com/phuryn/pm-skills/blob/main/CONTRIBUTING.md)
+[![Tests](https://github.com/phuryn/pm-skills/actions/workflows/tests.yml/badge.svg)](https://github.com/phuryn/pm-skills/actions/workflows/tests.yml)
 [![Companion: pm-skills](https://img.shields.io/badge/companion-pm--brain-blue)](https://github.com/phuryn/pm-brain)
 [![Companion: burnstop](https://img.shields.io/badge/companion-burnstop-blue)](https://github.com/phuryn/burnstop)
 [![Companion: claude-usage](https://img.shields.io/badge/companion-claude--usage-blue)](https://github.com/phuryn/claude-usage)
 
 # PM Skills Marketplace: The AI Operating System for Better Product Decisions
 
-> 68 PM skills and 42 chained workflows across 9 plugins. Claude Code, Cowork, and more. From discovery to strategy, execution, launch, growth, and shipping AI-built code. 
+> 69 PM skills and 42 chained workflows across 9 plugins. Claude Code, Cowork, and more. From discovery to strategy, execution, launch, growth, and shipping AI-built code. 
 
 ![PM Skills marketplace: skills, commands, and all 9 plugins at a glance](.docs/images/plugins.png)
 
@@ -437,7 +438,7 @@ Commands:
 </details>
 
 <details>
-<summary><strong>9. pm-ai-shipping</strong> — AI Shipping Kit: document a vibe-coded app, audit security and performance, map test coverage, compile a shipping packet (2 skills, 5 commands)</summary>
+<summary><strong>9. pm-ai-shipping</strong> — AI Shipping Kit: document a vibe-coded app, review it for correctness, security and performance defects, map test coverage, compile a shipping packet (3 skills, 5 commands)</summary>
 
 For PMs and founders accountable for AI-built code. AI agents write code fast but leave no record of *intent* — what the system should do, who may do what, where the secrets live, which rules are actually verified. This kit restores reviewability: it documents the system, then audits the gap between what the docs say and what the code actually does — the class of bug generic scanners miss.
 
@@ -452,7 +453,7 @@ For PMs and founders accountable for AI-built code. AI agents write code fast bu
 - `/document-app` — Reverse-engineer a codebase into the system documents reviewers and auditors need — a core set (architecture, flows, permissions, variables) plus conditional docs (emails, cron, SEO, automation) when they apply
 - `/derive-tests` — Turn documented intent into a test-coverage map: inventory the tests that exist today, separate them from proposed tests and unverified gaps, and recommend a green-before-merge CI gate
 - `/security-audit-static` — Static security audit: map trust boundaries, cross-reference documented intent, self-refute every finding, and report only evidence-backed risks
-- `/performance-audit-static` — Static performance audit: find over-fetching, missing indexes, and caching opportunities, ranked by effort and impact
+- `/performance-audit-static` — Static performance audit: find N+1 queries and request waterfalls, over-fetching, missing indexes, and caching opportunities, ranked by effort and impact
 
 **Examples:**
 

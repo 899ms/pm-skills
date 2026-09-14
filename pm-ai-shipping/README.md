@@ -24,7 +24,7 @@ Install from the [pm-skills marketplace](https://github.com/phuryn/pm-skills) an
 - `/pm-ai-shipping:document-app` — Reverse-engineer a codebase into the system documents reviewers and auditors need — a core set (architecture, flows, permissions, variables) plus conditional docs (emails, cron, SEO, automation) when they apply.
 - `/pm-ai-shipping:derive-tests` — Turn documented intent into a test-coverage map: inventory the tests that exist today, separate them from proposed tests and unverified gaps, mark each unit / guarded-live / manual, and recommend a green-before-merge CI gate.
 - `/pm-ai-shipping:security-audit-static` — Static security audit: map trust boundaries, cross-reference documented intent, self-refute every finding, and report only evidence-backed risks.
-- `/pm-ai-shipping:performance-audit-static` — Static performance audit: find over-fetching, missing indexes, and caching opportunities, ranked by effort and impact.
+- `/pm-ai-shipping:performance-audit-static` — Static performance audit: find N+1 queries and request waterfalls, over-fetching, missing indexes, and caching opportunities, ranked by effort and impact.
 
 ## Author
 
